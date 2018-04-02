@@ -39,7 +39,7 @@ void BigMotor::init(void) {
   // this lets you print messages
   // the string gets displayed in the messages area
   // the number counts the number of times it is displayed at 10 Hz
-  printer.printMessage("Initialized LED at " + String(millis()), 10);
+  printer.printMessage("Initialized Big Motor at " + String(millis()), 10);
 }
 
 void BigMotor::updateDirection(void) {
@@ -74,12 +74,23 @@ void BigMotor::updateDirection(void) {
 		}
 		//and update vars
 		currDir = desiredDir;
-		stateSwitchTime = millis();
 	}
 }
 
 void BigMotor::setDirection(BigMotor::Direction dir) {
-	desiredDir = dir;
+  desiredDir = dir;
+  //and wait at floating for a bit
+  digitalWrite(BIG_MOTOR_GND_A, LOW);
+  digitalWrite(BIG_MOTOR_PWR_A, LOW);
+  digitalWrite(BIG_MOTOR_PWR_B, LOW);
+  digitalWrite(BIG_MOTOR_GND_B, LOW);
+  stateSwitchTime = millis();
+}
+
+String BigMotor::printState(void) {
+  String printString = "BigMotor: ";
+  printString += currDir;
+  return printString;
 }
 
 size_t BigMotor::writeDataBytes(unsigned char * buffer, size_t idx) {

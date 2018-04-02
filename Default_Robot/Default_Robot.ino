@@ -22,6 +22,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #define mySerial Serial1
 #include <LED.h>  // A template of a data soruce library
 #include "BigMotor.h"
+#include "Pressure.h"
 
 /////////////////////////* Global Variables *////////////////////////
 
@@ -36,6 +37,7 @@ Logger logger;
 Printer printer;
 LED led;
 BigMotor bigMotor;
+Pressure pressure;
 
 // loop start recorder
 int loopStartTime;
@@ -52,6 +54,7 @@ void setup() {
   logger.include(&motor_driver);
   logger.include(&adc);
   logger.include(&bigMotor);
+  logger.include(&pressure);
   logger.init();
 
   printer.init();
@@ -61,6 +64,7 @@ void setup() {
   motor_driver.init();
   led.init();
   bigMotor.init();
+  pressure.init();
 
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
@@ -80,6 +84,7 @@ void setup() {
   state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + STATE_ESTIMATOR_LOOP_OFFSET;
   pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
+  pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
@@ -101,6 +106,8 @@ void loop() {
     printer.printValue(6,motor_driver.printState());
     printer.printValue(7,imu.printRollPitchHeading());        
     printer.printValue(8,imu.printAccels());
+    printer.printValue(9,bigMotor.printState());
+    printer.printValue(10,pressure.printState());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
@@ -139,6 +146,11 @@ void loop() {
   if (currentTime-bigMotor.lastExecutionTime > LOOP_PERIOD) {
     bigMotor.lastExecutionTime = currentTime;
     bigMotor.updateDirection();
+  }
+
+  if (currentTime-pressure.lastExecutionTime > LOOP_PERIOD) {
+    pressure.lastExecutionTime = currentTime;
+    pressure.readPressure();
   }
 
   if (currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging) {
