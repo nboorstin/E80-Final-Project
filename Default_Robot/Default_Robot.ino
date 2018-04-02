@@ -51,6 +51,7 @@ void setup() {
   logger.include(&state_estimator);
   logger.include(&motor_driver);
   logger.include(&adc);
+  logger.include(&bigMotor);
   logger.init();
 
   printer.init();
@@ -78,6 +79,7 @@ void setup() {
   adc.lastExecutionTime             = loopStartTime - LOOP_PERIOD + ADC_LOOP_OFFSET;
   state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + STATE_ESTIMATOR_LOOP_OFFSET;
   pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
+  bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
@@ -132,6 +134,11 @@ void loop() {
   if (currentTime-led.lastExecutionTime > LOOP_PERIOD) {
     led.lastExecutionTime = currentTime;
     led.flashLED();
+  }
+
+  if (currentTime-bigMotor.lastExecutionTime > LOOP_PERIOD) {
+    bigMotor.lastExecutionTime = currentTime;
+    bigMotor.updateDirection();
   }
 
   if (currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging) {

@@ -7,11 +7,15 @@
 // include relevant libraries, always good to have these two
 #include <Arduino.h>
 #include "Pinouts.h"
+#include "DataSource.h"
+
+//for timings
+#define BIG_MOTOR_LOOP_OFFSET 60
 
 // controls how often and when in the loop this class's functions run
 
 
-class BigMotor {
+class BigMotor : public DataSource {
 public: // for functions outside code might call
   enum Direction {FLOATING, STOP, FWD, BACK};
   
@@ -24,6 +28,8 @@ public: // for functions outside code might call
   void updateDirection(void);
   
   void setDirection(Direction dir);
+  
+  size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
   int lastExecutionTime = -1;
   

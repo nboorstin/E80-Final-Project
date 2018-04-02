@@ -13,7 +13,7 @@
 extern Printer printer;
 
 // constructor for class objects
-BigMotor::BigMotor(void) {
+BigMotor::BigMotor(void) : DataSource("currDir,desiredDir","int,int"){
 }
 
 void BigMotor::init(void) {
@@ -80,4 +80,11 @@ void BigMotor::updateDirection(void) {
 
 void BigMotor::setDirection(BigMotor::Direction dir) {
 	desiredDir = dir;
+}
+
+size_t BigMotor::writeDataBytes(unsigned char * buffer, size_t idx) {
+  int * data_slot = (int *) &buffer[idx];
+  data_slot[0] = currDir;
+  data_slot[1] = desiredDir;
+  return idx + 2*sizeof(int);
 }
