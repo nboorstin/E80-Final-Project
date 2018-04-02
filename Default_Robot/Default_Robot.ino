@@ -21,6 +21,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <PControl.h>
 #define mySerial Serial1
 #include <LED.h>  // A template of a data soruce library
+#include "BigMotor.h"
 
 /////////////////////////* Global Variables *////////////////////////
 
@@ -34,6 +35,7 @@ SensorIMU imu;
 Logger logger;
 Printer printer;
 LED led;
+BigMotor bigMotor;
 
 // loop start recorder
 int loopStartTime;
@@ -57,6 +59,7 @@ void setup() {
   gps.init(&GPS);
   motor_driver.init();
   led.init();
+  bigMotor.init();
 
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
