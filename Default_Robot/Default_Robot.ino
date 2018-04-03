@@ -23,6 +23,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <LED.h>  // A template of a data soruce library
 #include "BigMotor.h"
 #include "Pressure.h"
+#include "Force.h"
 
 /////////////////////////* Global Variables *////////////////////////
 
@@ -38,6 +39,7 @@ Printer printer;
 LED led;
 BigMotor bigMotor;
 Pressure pressure;
+Force force;
 
 // loop start recorder
 int loopStartTime;
@@ -55,6 +57,7 @@ void setup() {
   logger.include(&adc);
   logger.include(&bigMotor);
   logger.include(&pressure);
+  logger.include(&force);
   logger.init();
 
   printer.init();
@@ -65,6 +68,7 @@ void setup() {
   led.init();
   bigMotor.init();
   pressure.init();
+  force.init(); 
 
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
@@ -85,6 +89,7 @@ void setup() {
   pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
+  force.lastExecutionTime           = loopStartTime - Loop_PERIOD + FORCE_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
@@ -108,6 +113,7 @@ void loop() {
     printer.printValue(8,imu.printAccels());
     printer.printValue(9,bigMotor.printState());
     printer.printValue(10,pressure.printState());
+    printer.printValue(11, force.printState());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
@@ -151,6 +157,11 @@ void loop() {
   if (currentTime-pressure.lastExecutionTime > LOOP_PERIOD) {
     pressure.lastExecutionTime = currentTime;
     pressure.readPressure();
+  }
+
+  if (currentTime-force.lastExecutionTime > LOOP_PERIOD) {
+    force.lastExecutionTime = currentTime;
+    force.readForce();
   }
 
   if (currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging) {
