@@ -15,7 +15,7 @@
 
 class BigMotor : public DataSource {
 public: // for functions outside code might call
-  enum Direction {FLOATING, STOP, FWD, BACK};
+  enum Direction {FLOATINGG, STOP, FWD, BACK};
   
   Direction currDir, desiredDir;
 
@@ -36,7 +36,7 @@ public: // for functions outside code might call
   unsigned long stateSwitchTime = 0;
   
 private:
-  const unsigned long motorSwitchDelay = 100; //0.1 seconds
+  const unsigned long motorSwitchDelay = 400; //0.4 seconds
   
 };
 

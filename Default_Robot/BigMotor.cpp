@@ -23,11 +23,11 @@ void BigMotor::init(void) {
   pinMode(BIG_MOTOR_PWR_B, OUTPUT);
   pinMode(BIG_MOTOR_GND_B, OUTPUT);
   
-  //assume they all start floating
-  currDir = FLOATING;
+  //assume they all start FLOATING
+  currDir = FLOATINGG;
   desiredDir = STOP;
   
-  //and set them all to floating, because why not?
+  //and set them all to FLOATING, because why not?
   digitalWrite(BIG_MOTOR_GND_A, LOW);
   digitalWrite(BIG_MOTOR_PWR_A, LOW);
   digitalWrite(BIG_MOTOR_PWR_B, LOW);
@@ -45,7 +45,7 @@ void BigMotor::init(void) {
 void BigMotor::updateDirection(void) {
 	if(currDir != desiredDir && millis() - stateSwitchTime >= motorSwitchDelay) {
 		switch(desiredDir) {
-			case FLOATING:
+			case FLOATINGG:
 				 digitalWrite(BIG_MOTOR_GND_A, LOW);
 				 digitalWrite(BIG_MOTOR_PWR_A, LOW);
 				 digitalWrite(BIG_MOTOR_PWR_B, LOW);
@@ -78,13 +78,15 @@ void BigMotor::updateDirection(void) {
 }
 
 void BigMotor::setDirection(BigMotor::Direction dir) {
-  desiredDir = dir;
-  //and wait at floating for a bit
-  digitalWrite(BIG_MOTOR_GND_A, LOW);
-  digitalWrite(BIG_MOTOR_PWR_A, LOW);
-  digitalWrite(BIG_MOTOR_PWR_B, LOW);
-  digitalWrite(BIG_MOTOR_GND_B, LOW);
-  stateSwitchTime = millis();
+  if(desiredDir != dir) {
+    desiredDir = dir;
+    //and wait at FLOATINGG for a bit
+    digitalWrite(BIG_MOTOR_GND_A, LOW);
+    digitalWrite(BIG_MOTOR_PWR_A, LOW);
+    digitalWrite(BIG_MOTOR_PWR_B, LOW);
+    digitalWrite(BIG_MOTOR_GND_B, LOW);
+    stateSwitchTime = millis();
+  }
 }
 
 String BigMotor::printState(void) {

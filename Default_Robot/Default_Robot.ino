@@ -99,6 +99,17 @@ void setup() {
 
 void loop() {
   currentTime=millis();
+
+  //test big motor
+  int secondsInForty = (currentTime / 1000) % 40;
+  if(secondsInForty < 10)
+    bigMotor.setDirection(BigMotor::FLOATINGG);
+  else if(secondsInForty < 20)
+    bigMotor.setDirection(BigMotor::FWD);
+  else if(secondsInForty < 30)
+    bigMotor.setDirection(BigMotor::BACK);
+  else
+    bigMotor.setDirection(BigMotor::STOP);
   
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
