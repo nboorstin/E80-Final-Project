@@ -9,7 +9,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <Wire.h>
 #include <Pinouts.h>
 #include <TimingOffsets.h>
-
+//#include <RTEncoder.h>
 #include <SensorGPS.h>
 #include <SensorIMU.h>
 #include <StateEstimator.h>
@@ -26,7 +26,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include "Force.h"
 
 /////////////////////////* Global Variables *////////////////////////
-
+//RTEncoder RTEncoder(2,3);
 MotorDriver motor_driver;
 StateEstimator state_estimator;
 PControl pcontrol;
@@ -40,6 +40,13 @@ LED led;
 BigMotor bigMotor;
 Pressure pressure;
 Force force;
+
+//Defining variables for rotary encoder
+int counter;
+int pin1 = 2;
+int pin2 = 3;
+bool goingUp = false;
+bool goingDown = false;
 
 // loop start recorder
 int loopStartTime;
@@ -70,6 +77,19 @@ void setup() {
   pressure.init();
   force.init(); 
 
+
+  //Setup code for Rotary Encoder
+  counter = 0;
+
+  //Setup Encoder pins as inputs
+  pinMode(pin1, INPUT);
+  pinMode(pin2, INPUT);
+
+  //Encoder pin on interrupt 0 (pin 2 right now but going to change)
+  attachInterrupt(0,decoder,FALLING);
+  
+  //End of Rotary Encoder setup code
+  
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
   double waypoints [] = { 0, 10, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
@@ -93,7 +113,23 @@ void setup() {
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
+//////////////////////////*Defining Decoder Function for Rotary Encoder*/////////////////////////////////
 
+void decoder()
+//very short interrupt routine 
+//Remember that the routine is only called when pin1
+//changes state, so it's the value of pin2 that we're
+//interested in here
+{
+if (digitalRead(pin1) == digitalRead(pin2))
+{
+goingUp = 1; //if encoder channels are the same, direction is CW
+}
+else
+{
+goingDown = 1; //if they are not the same, direction is CCW
+}
+}
 
 //////////////////////////////* Loop */////////////////////////
 
@@ -179,5 +215,36 @@ void loop() {
     logger.lastExecutionTime = currentTime;
     logger.log();
   }
+
+  //Rotary Encoder Portion of loop()
+  //using while statement to stay in the loop for continuous interrupts
+  /*while(RTEncoder.goingUp == 1) // CW motion in the rotary encoder
+  {
+    RTEncoder.goingUp = 0; // Reset the flag  
+    RTEncoder.counter ++;
+    Serial.println(RTEncoder.counter);
+  }
+
+  while(RTEncoder.goingDown == 1) // CCW motion in rotary encoder
+  {
+    RTEncoder.goingDown = 0; // clear the flag
+    RTEncoder.counter --;
+    Serial.println(RTEncoder.counter);
+  }
+*/
+//Loop Code for Encoder Interrupts
+//using while statement to stay in the loop for continuous interrupts
+while(goingUp==1) // CW motion in the rotary encoder
+{
+goingUp=0; // Reset the flag
+counter ++;
+}
+
+while(goingDown==1) // CCW motion in rotary encoder
+{
+goingDown=0; // clear the flag
+counter --;
+}
+  
 }
 
