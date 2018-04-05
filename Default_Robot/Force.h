@@ -7,7 +7,7 @@
 #include "Pinouts.h"
 
 //for timings
-#define FORCE_LOOP_OFFSET 65
+#define FORCE_LOOP_OFFSET 75
 
 // controls how often and when in the loop this class's functions run
 
