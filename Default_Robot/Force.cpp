@@ -2,7 +2,7 @@
 #include "Force.h"
 
 //Pin definitions
-#define FORCE_PIN 2
+#define FORCE_PIN 17
 
 // this allows you to use print calls
 // (see IMU or ADC libraries for good examples)
