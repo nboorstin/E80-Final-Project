@@ -2,9 +2,9 @@
 #include "BigMotor.h"
 
 //Pin definitions
-#define BIG_MOTOR_GND_A 10
+#define BIG_MOTOR_GND_A 16
 #define BIG_MOTOR_PWR_A 12
-#define BIG_MOTOR_PWR_B 15
+#define BIG_MOTOR_PWR_B 10
 #define BIG_MOTOR_GND_B 15
 
 // this allows you to use print calls
