@@ -89,7 +89,7 @@ void setup() {
   pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
-  force.lastExecutionTime           = loopStartTime - Loop_PERIOD + FORCE_LOOP_OFFSET;
+  force.lastExecutionTime           = loopStartTime - LOOP_PERIOD + FORCE_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 

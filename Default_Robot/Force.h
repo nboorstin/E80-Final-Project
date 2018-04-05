@@ -5,6 +5,7 @@
 // include relevant libraries, always good to have these two
 #include <Arduino.h>
 #include "Pinouts.h"
+#include <DataSource.h>
 
 //for timings
 #define FORCE_LOOP_OFFSET 75
@@ -19,12 +20,14 @@ public: // for functions outside code might call
 
   void readForce(void);
 
+  int currentForce;
+
   String printState(void);
   
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
-  int lastExecutionTime = -1;]
+  int lastExecutionTime = -1;
   
 };
 
-
+#endif

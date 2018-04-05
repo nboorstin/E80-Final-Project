@@ -1,4 +1,4 @@
-f// this includes everything from the header file
+// this includes everything from the header file
 #include "Force.h"
 
 //Pin definitions
@@ -17,7 +17,7 @@ void Force::init(void) {
   //setup pins as input
   pinMode(FORCE_PIN, INPUT);
 
-  currentPressure = 0;
+  currentForce = 0;
 
   // this lets you print messages
   // the string gets displayed in the messages area

@@ -22,10 +22,12 @@ public: // for functions outside code might call
   void readPressure(void);
 
   String printState(void);
+
+  int currentPressure;
   
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
-  int lastExecutionTime = -1;]
+  int lastExecutionTime = -1;
   
 };
 
