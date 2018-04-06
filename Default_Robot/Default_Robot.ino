@@ -9,7 +9,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <Wire.h>
 #include <Pinouts.h>
 #include <TimingOffsets.h>
-#include <RTEncoder.h>
+#include "RTEncoder.h"
 #include <SensorGPS.h>
 #include <SensorIMU.h>
 #include <StateEstimator.h>
@@ -38,7 +38,7 @@ Logger logger;
 Printer printer;
 LED led;
 BigMotor bigMotor;
-Pressure pressure
+Pressure pressure;
 Force force;
 
 //Defining variables for rotary encoder
@@ -150,7 +150,7 @@ void loop() {
     bigMotor.setDirection(BigMotor::STOP);
   //NOTE: Right after the AUV arrives at desired Location we set 
   //anchorDrop to True to start actual polling of encoder
-  anchorDrop = true;
+  RTEncoder.anchorDrop = true;
 
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
