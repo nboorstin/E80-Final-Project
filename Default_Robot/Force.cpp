@@ -2,7 +2,7 @@
 #include "Force.h"
 
 //Pin definitions
-#define FORCE_PIN 17
+#define FORCE_PIN 2
 
 // this allows you to use print calls
 // (see IMU or ADC libraries for good examples)
@@ -10,7 +10,7 @@
 extern Printer printer;
 
 // constructor for class objects
-Force::Force(void) : DataSource("force","int"){
+Force::Force(void) : DataSource("force","int32"){
 }
 
 void Force::init(void) {

@@ -2,18 +2,18 @@
 #include "BigMotor.h"
 
 //Pin definitions
-#define BIG_MOTOR_GND_A 16
-#define BIG_MOTOR_PWR_A 12
-#define BIG_MOTOR_PWR_B 10
-#define BIG_MOTOR_GND_B 15
+#define BIG_MOTOR_GND_A A16
+#define BIG_MOTOR_PWR_A A19
+#define BIG_MOTOR_PWR_B A18
+#define BIG_MOTOR_GND_B A15
 
-// this allows you to use print calls
+// this al0s you to use print calls
 // (see IMU or ADC libraries for good examples)
 #include "Printer.h"
 extern Printer printer;
 
 // constructor for class objects
-BigMotor::BigMotor(void) : DataSource("currDir,desiredDir","int,int"){
+BigMotor::BigMotor(void) : DataSource("currDir,desiredDir","int32,int32"){
 }
 
 void BigMotor::init(void) {
@@ -28,10 +28,10 @@ void BigMotor::init(void) {
   desiredDir = STOP;
   
   //and set them all to FLOATING, because why not?
-  digitalWrite(BIG_MOTOR_GND_A, LOW);
-  digitalWrite(BIG_MOTOR_PWR_A, LOW);
-  digitalWrite(BIG_MOTOR_PWR_B, LOW);
-  digitalWrite(BIG_MOTOR_GND_B, LOW);
+  analogWrite(BIG_MOTOR_GND_A, 0);
+  analogWrite(BIG_MOTOR_PWR_A, 0);
+  analogWrite(BIG_MOTOR_PWR_B, 0);
+  analogWrite(BIG_MOTOR_GND_B, 0);
   
   //and set the current time
   stateSwitchTime = millis();
@@ -46,28 +46,28 @@ void BigMotor::updateDirection(void) {
 	if(currDir != desiredDir && millis() - stateSwitchTime >= motorSwitchDelay) {
 		switch(desiredDir) {
 			case FLOATINGG:
-				 digitalWrite(BIG_MOTOR_GND_A, LOW);
-				 digitalWrite(BIG_MOTOR_PWR_A, LOW);
-				 digitalWrite(BIG_MOTOR_PWR_B, LOW);
-				 digitalWrite(BIG_MOTOR_GND_B, LOW);
+				 analogWrite(BIG_MOTOR_GND_A, 0);
+				 analogWrite(BIG_MOTOR_PWR_A, 0);
+				 analogWrite(BIG_MOTOR_PWR_B, 0);
+				 analogWrite(BIG_MOTOR_GND_B, 0);
 				 break;
 			case STOP:
-				 digitalWrite(BIG_MOTOR_GND_A, HIGH);
-				 digitalWrite(BIG_MOTOR_PWR_A, LOW);
-				 digitalWrite(BIG_MOTOR_PWR_B, LOW);
-				 digitalWrite(BIG_MOTOR_GND_B, HIGH);
+				 analogWrite(BIG_MOTOR_GND_A, 255);
+				 analogWrite(BIG_MOTOR_PWR_A, 0);
+				 analogWrite(BIG_MOTOR_PWR_B, 0);
+				 analogWrite(BIG_MOTOR_GND_B, 255);
 				 break;
 			case FWD:
-				 digitalWrite(BIG_MOTOR_GND_A, HIGH);
-				 digitalWrite(BIG_MOTOR_PWR_A, LOW);
-				 digitalWrite(BIG_MOTOR_PWR_B, HIGH);
-				 digitalWrite(BIG_MOTOR_GND_B, LOW);
+				 analogWrite(BIG_MOTOR_GND_A, 255);
+				 analogWrite(BIG_MOTOR_PWR_A, 0);
+				 analogWrite(BIG_MOTOR_PWR_B, 255);
+				 analogWrite(BIG_MOTOR_GND_B, 0);
 				 break;
 			case BACK:
-				 digitalWrite(BIG_MOTOR_GND_A, LOW);
-				 digitalWrite(BIG_MOTOR_PWR_A, HIGH);
-				 digitalWrite(BIG_MOTOR_PWR_B, LOW);
-				 digitalWrite(BIG_MOTOR_GND_B, HIGH);
+				 analogWrite(BIG_MOTOR_GND_A, 0);
+				 analogWrite(BIG_MOTOR_PWR_A, 255);
+				 analogWrite(BIG_MOTOR_PWR_B, 0);
+				 analogWrite(BIG_MOTOR_GND_B, 255);
 				 break;				
 			//default:
 				//log some panic thing here
@@ -81,10 +81,10 @@ void BigMotor::setDirection(BigMotor::Direction dir) {
   if(desiredDir != dir) {
     desiredDir = dir;
     //and wait at FLOATINGG for a bit
-    digitalWrite(BIG_MOTOR_GND_A, LOW);
-    digitalWrite(BIG_MOTOR_PWR_A, LOW);
-    digitalWrite(BIG_MOTOR_PWR_B, LOW);
-    digitalWrite(BIG_MOTOR_GND_B, LOW);
+    analogWrite(BIG_MOTOR_GND_A, 0);
+    analogWrite(BIG_MOTOR_PWR_A, 0);
+    analogWrite(BIG_MOTOR_PWR_B, 0);
+    analogWrite(BIG_MOTOR_GND_B, 0);
     stateSwitchTime = millis();
   }
 }

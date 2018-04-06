@@ -50,25 +50,23 @@ int current_way_point = 0;
 
 void setup() {
   
-  logger.include(&imu);
+  /*logger.include(&imu);
   logger.include(&gps);
-  logger.include(&state_estimator);
+  //logger.include(&state_estimator);
   logger.include(&motor_driver);
-  logger.include(&adc);
+  //logger.include(&adc);*/
   logger.include(&bigMotor);
   logger.include(&pressure);
   logger.include(&force);
   logger.init();
 
   printer.init();
-  imu.init();
+  /*imu.init();
   mySerial.begin(9600);
   gps.init(&GPS);
   motor_driver.init();
   led.init();
-  bigMotor.init();
-  pressure.init();
-  force.init(); 
+  
 
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
@@ -77,7 +75,11 @@ void setup() {
   
   const float origin_lat = 34.106465;
   const float origin_lon = -117.712488;
-  state_estimator.init(origin_lat, origin_lon); 
+  state_estimator.init(origin_lat, origin_lon); */
+
+  bigMotor.init();
+  pressure.init();
+  force.init(); 
 
   printer.printMessage("Starting main loop",10);
   loopStartTime = millis();
@@ -110,25 +112,26 @@ void loop() {
     bigMotor.setDirection(BigMotor::BACK);
   else
     bigMotor.setDirection(BigMotor::STOP);
-  
+      //bigMotor.setDirection(BigMotor::BACK);
+
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
     printer.printValue(0,adc.printSample());
     printer.printValue(1,logger.printState());
     printer.printValue(2,gps.printState());   
     printer.printValue(3,state_estimator.printState());     
-    printer.printValue(4,pcontrol.printWaypointUpdate());
+    //printer.printValue(4,pcontrol.printWaypointUpdate());
     printer.printValue(5,pcontrol.printString());
     printer.printValue(6,motor_driver.printState());
     printer.printValue(7,imu.printRollPitchHeading());        
-    printer.printValue(8,imu.printAccels());
+    //printer.printValue(8,imu.printAccels());
     printer.printValue(9,bigMotor.printState());
-    printer.printValue(10,pressure.printState());
-    printer.printValue(11, force.printState());
+    printer.printValue(8,pressure.printState());
+    printer.printValue(4, force.printState());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  if ( currentTime-pcontrol.lastExecutionTime > LOOP_PERIOD ) {
+  /*if ( currentTime-pcontrol.lastExecutionTime > LOOP_PERIOD ) {
     pcontrol.lastExecutionTime = currentTime;
     pcontrol.calculateControl(&state_estimator.state);
     motor_driver.driveForward(pcontrol.uL,pcontrol.uR);
@@ -158,7 +161,7 @@ void loop() {
   if (currentTime-led.lastExecutionTime > LOOP_PERIOD) {
     led.lastExecutionTime = currentTime;
     led.flashLED();
-  }
+  }*/
 
   if (currentTime-bigMotor.lastExecutionTime > LOOP_PERIOD) {
     bigMotor.lastExecutionTime = currentTime;

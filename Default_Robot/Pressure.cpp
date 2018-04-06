@@ -10,7 +10,7 @@
 extern Printer printer;
 
 // constructor for class objects
-Pressure::Pressure(void) : DataSource("pressure","int"){
+Pressure::Pressure(void) : DataSource("pressure","int32"){
 }
 
 void Pressure::init(void) {
@@ -26,7 +26,7 @@ void Pressure::init(void) {
 }
 
 String Pressure::printState(void) {
-  String printString = "BigMotor: ";
+  String printString = "Pressure: ";
   printString += currentPressure;
   return printString;
 }
