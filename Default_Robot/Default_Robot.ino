@@ -9,7 +9,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <Wire.h>
 #include <Pinouts.h>
 #include <TimingOffsets.h>
-//#include <RTEncoder.h>
+#include <RTEncoder.h>
 #include <SensorGPS.h>
 #include <SensorIMU.h>
 #include <StateEstimator.h>
@@ -26,7 +26,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include "Force.h"
 
 /////////////////////////* Global Variables *////////////////////////
-//RTEncoder RTEncoder(2,3);
+RTEncoder RTEncoder;
 MotorDriver motor_driver;
 StateEstimator state_estimator;
 PControl pcontrol;
@@ -38,15 +38,15 @@ Logger logger;
 Printer printer;
 LED led;
 BigMotor bigMotor;
-Pressure pressure;
+Pressure pressure
 Force force;
 
 //Defining variables for rotary encoder
-int counter;
-int pin1 = 2;
-int pin2 = 3;
-bool goingUp = false;
-bool goingDown = false;
+//int counter;
+//int pin1 = 2;
+//int pin2 = 3;
+//bool goingUp = false;
+//bool goingDown = false;
 
 // loop start recorder
 int loopStartTime;
@@ -65,6 +65,7 @@ void setup() {
   logger.include(&bigMotor);
   logger.include(&pressure);
   logger.include(&force);
+  logger.include(&RTEncoder);
   logger.init();
 
   printer.init();
@@ -75,21 +76,22 @@ void setup() {
   led.init();
   bigMotor.init();
   pressure.init();
-  force.init(); 
-
+  force.init();
+  RTEncoder.init();
+ 
 
   //Setup code for Rotary Encoder
-  counter = 0;
+  //counter = 0;
 
   //Setup Encoder pins as inputs
-  pinMode(pin1, INPUT);
-  pinMode(pin2, INPUT);
+  //pinMode(pin1, INPUT);
+  //pinMode(pin2, INPUT);
 
   //Encoder pin on interrupt 0 (pin 2 right now but going to change)
-  attachInterrupt(0,decoder,FALLING);
+  //attachInterrupt(0,decoder,FALLING);
   
   //End of Rotary Encoder setup code
-  
+
   const int number_of_waypoints = 2;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
   double waypoints [] = { 0, 10, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
@@ -110,27 +112,27 @@ void setup() {
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
   force.lastExecutionTime           = loopStartTime - LOOP_PERIOD + FORCE_LOOP_OFFSET;
+  RTEncoder.lastExecutionTime       = loopStartTime - LOOP_PERIOD + RTENCODER_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
 //////////////////////////*Defining Decoder Function for Rotary Encoder*/////////////////////////////////
 
-void decoder()
+//void decoder()
 //very short interrupt routine 
 //Remember that the routine is only called when pin1
 //changes state, so it's the value of pin2 that we're
-//interested in here
-{
-if (digitalRead(pin1) == digitalRead(pin2))
-{
-goingUp = 1; //if encoder channels are the same, direction is CW
-}
-else
-{
-goingDown = 1; //if they are not the same, direction is CCW
-}
-}
-
+//interrested in here
+//{
+//if (digitalRead(pin1) == digitalRead(pin2))
+//{
+//goingUp = 1; //if encoder channels are the same, direction is CW
+//}
+//else
+//{
+//goingDown = 1; //if they are not the same, direction is CCW/
+//}
+//}
 //////////////////////////////* Loop */////////////////////////
 
 void loop() {
@@ -146,7 +148,10 @@ void loop() {
     bigMotor.setDirection(BigMotor::BACK);
   else
     bigMotor.setDirection(BigMotor::STOP);
-  
+  //NOTE: Right after the AUV arrives at desired Location we set 
+  //anchorDrop to True to start actual polling of encoder
+  anchorDrop = true;
+
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
     printer.printValue(0,adc.printSample());
@@ -161,6 +166,7 @@ void loop() {
     printer.printValue(9,bigMotor.printState());
     printer.printValue(10,pressure.printState());
     printer.printValue(11, force.printState());
+    printer.printValue(12, RTEncoder.printState()); 
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
@@ -195,7 +201,6 @@ void loop() {
     led.lastExecutionTime = currentTime;
     led.flashLED();
   }
-
   if (currentTime-bigMotor.lastExecutionTime > LOOP_PERIOD) {
     bigMotor.lastExecutionTime = currentTime;
     bigMotor.updateDirection();
@@ -210,12 +215,15 @@ void loop() {
     force.lastExecutionTime = currentTime;
     force.readForce();
   }
-
+  
+  if (currentTime-RTEncoder.lastExecutionTime > LOOP_PERIOD) {
+    RTEncoder.lastExecutionTime = currentTime;
+    RTEncoder.readRTEncoder();
+  }
   if (currentTime- logger.lastExecutionTime > LOOP_PERIOD && logger.keepLogging) {
     logger.lastExecutionTime = currentTime;
     logger.log();
   }
-
   //Rotary Encoder Portion of loop()
   //using while statement to stay in the loop for continuous interrupts
   /*while(RTEncoder.goingUp == 1) // CW motion in the rotary encoder
@@ -234,17 +242,17 @@ void loop() {
 */
 //Loop Code for Encoder Interrupts
 //using while statement to stay in the loop for continuous interrupts
-while(goingUp==1) // CW motion in the rotary encoder
-{
-goingUp=0; // Reset the flag
-counter ++;
-}
+//while(goingUp==1) // CW motion in the rotary encoder
+//{
+//goingUp=0; // Reset the flag
+//counter ++;
+//}
 
-while(goingDown==1) // CCW motion in rotary encoder
-{
-goingDown=0; // clear the flag
-counter --;
-}
+//while(goingDown==1) // CCW motion in rotary encoder
+//{
+//goingDown=0; // clear the flag
+//counter --;
+//}
   
 }
 
