@@ -14,7 +14,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <SensorIMU.h>
 #include <StateEstimator.h>
 #include <Adafruit_GPS.h>
-#include <ADCSampler.h>
+//#include <ADCSampler.h>
 #include <MotorDriver.h>
 #include <Logger.h>
 #include <Printer.h>
@@ -24,6 +24,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include "BigMotor.h"
 #include "Pressure.h"
 #include "Force.h"
+#include "OpenLoop.h"
 
 /////////////////////////* Global Variables *////////////////////////
 
@@ -32,7 +33,7 @@ StateEstimator state_estimator;
 PControl pcontrol;
 SensorGPS gps;
 Adafruit_GPS GPS(&mySerial);  // FIX THIS
-ADCSampler adc;
+//ADCSampler adc;
 SensorIMU imu;
 Logger logger;
 Printer printer;
@@ -46,36 +47,38 @@ int loopStartTime;
 int currentTime;
 int current_way_point = 0;
 
+bool buttonPressed = false;
+
 ////////////////////////* Setup *////////////////////////////////
 
 void setup() {
   
-  /*logger.include(&imu);
+  logger.include(&imu);
   logger.include(&gps);
-  //logger.include(&state_estimator);
+  logger.include(&state_estimator);
   logger.include(&motor_driver);
-  //logger.include(&adc);*/
+  //logger.include(&adc);
   logger.include(&bigMotor);
   logger.include(&pressure);
   logger.include(&force);
   logger.init();
 
   printer.init();
-  /*imu.init();
+  imu.init();
   mySerial.begin(9600);
   gps.init(&GPS);
   motor_driver.init();
   led.init();
   
 
-  const int number_of_waypoints = 2;
+  const int number_of_waypoints = 1;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
-  double waypoints [] = { 0, 10, 0, 0 };   // listed as x0,y0,x1,y1, ... etc.
+  double waypoints [] = { 0, 10};   // listed as x0,y0,x1,y1, ... etc.
   pcontrol.init(number_of_waypoints, waypoint_dimensions, waypoints);
   
   const float origin_lat = 34.106465;
   const float origin_lon = -117.712488;
-  state_estimator.init(origin_lat, origin_lon); */
+  state_estimator.init(origin_lat, origin_lon);
 
   bigMotor.init();
   pressure.init();
@@ -86,7 +89,7 @@ void setup() {
   printer.lastExecutionTime         = loopStartTime - LOOP_PERIOD + PRINTER_LOOP_OFFSET ;
   imu.lastExecutionTime             = loopStartTime - LOOP_PERIOD + IMU_LOOP_OFFSET;
   gps.lastExecutionTime             = loopStartTime - LOOP_PERIOD + GPS_LOOP_OFFSET;
-  adc.lastExecutionTime             = loopStartTime - LOOP_PERIOD + ADC_LOOP_OFFSET;
+  //adc.lastExecutionTime             = loopStartTime - LOOP_PERIOD + ADC_LOOP_OFFSET;
   state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + STATE_ESTIMATOR_LOOP_OFFSET;
   pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
@@ -116,12 +119,12 @@ void loop() {
 
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
-    printer.printValue(0,adc.printSample());
+    //printer.printValue(0,adc.printSample());
     printer.printValue(1,logger.printState());
     printer.printValue(2,gps.printState());   
     printer.printValue(3,state_estimator.printState());     
     //printer.printValue(4,pcontrol.printWaypointUpdate());
-    printer.printValue(5,pcontrol.printString());
+    //printer.printValue(5,pcontrol.printString());
     printer.printValue(6,motor_driver.printState());
     printer.printValue(7,imu.printRollPitchHeading());        
     //printer.printValue(8,imu.printAccels());
@@ -131,16 +134,16 @@ void loop() {
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  /*if ( currentTime-pcontrol.lastExecutionTime > LOOP_PERIOD ) {
+  if ( currentTime-pcontrol.lastExecutionTime > LOOP_PERIOD ) {
     pcontrol.lastExecutionTime = currentTime;
     pcontrol.calculateControl(&state_estimator.state);
     motor_driver.driveForward(pcontrol.uL,pcontrol.uR);
   }
 
-  if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
+  /*if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {
     adc.lastExecutionTime = currentTime;
     adc.updateSample(); 
-  }
+  }*/
 
   if ( currentTime-imu.lastExecutionTime > LOOP_PERIOD ) {
     imu.lastExecutionTime = currentTime;
@@ -158,7 +161,7 @@ void loop() {
   }
   
   // uses the LED library to flash LED -- use this as a template for new libraries!
-  if (currentTime-led.lastExecutionTime > LOOP_PERIOD) {
+  /*if (currentTime-led.lastExecutionTime > LOOP_PERIOD) {
     led.lastExecutionTime = currentTime;
     led.flashLED();
   }*/
