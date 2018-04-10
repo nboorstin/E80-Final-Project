@@ -41,13 +41,12 @@ LED led;
 BigMotor bigMotor;
 Pressure pressure;
 Force force;
+OpenLoop openLoop(bigMotor, pcontrol, force);
 
 // loop start recorder
 int loopStartTime;
 int currentTime;
 int current_way_point = 0;
-
-bool buttonPressed = false;
 
 ////////////////////////* Setup *////////////////////////////////
 
@@ -71,10 +70,15 @@ void setup() {
   led.init();
   
 
-  const int number_of_waypoints = 1;
+  const int number_of_waypoints = 2;
+  const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
+  int waypoints [] = { 255, 255, 255, 100};   // listed as x0,y0,x1,y1, ... etc.
+  openLoop.init(number_of_waypoints, waypoint_dimensions, waypoints);
+
+  /*const int number_of_waypoints = 1;
   const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
   double waypoints [] = { 0, 10};   // listed as x0,y0,x1,y1, ... etc.
-  pcontrol.init(number_of_waypoints, waypoint_dimensions, waypoints);
+  pcontrol.init(number_of_waypoints, waypoint_dimensions, waypoints);*/
   
   const float origin_lat = 34.106465;
   const float origin_lon = -117.712488;
@@ -91,7 +95,7 @@ void setup() {
   gps.lastExecutionTime             = loopStartTime - LOOP_PERIOD + GPS_LOOP_OFFSET;
   //adc.lastExecutionTime             = loopStartTime - LOOP_PERIOD + ADC_LOOP_OFFSET;
   state_estimator.lastExecutionTime = loopStartTime - LOOP_PERIOD + STATE_ESTIMATOR_LOOP_OFFSET;
-  pcontrol.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
+  openLoop.lastExecutionTime        = loopStartTime - LOOP_PERIOD + P_CONTROL_LOOP_OFFSET;
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
   force.lastExecutionTime           = loopStartTime - LOOP_PERIOD + FORCE_LOOP_OFFSET;
@@ -105,18 +109,6 @@ void setup() {
 void loop() {
   currentTime=millis();
 
-  //test big motor
-  int secondsInForty = (currentTime / 1000) % 40;
-  if(secondsInForty < 10)
-    bigMotor.setDirection(BigMotor::FLOATINGG);
-  else if(secondsInForty < 20)
-    bigMotor.setDirection(BigMotor::FWD);
-  else if(secondsInForty < 30)
-    bigMotor.setDirection(BigMotor::BACK);
-  else
-    bigMotor.setDirection(BigMotor::STOP);
-      //bigMotor.setDirection(BigMotor::BACK);
-
   if ( currentTime-printer.lastExecutionTime > LOOP_PERIOD ) {
     printer.lastExecutionTime = currentTime;
     //printer.printValue(0,adc.printSample());
@@ -124,7 +116,7 @@ void loop() {
     printer.printValue(2,gps.printState());   
     printer.printValue(3,state_estimator.printState());     
     //printer.printValue(4,pcontrol.printWaypointUpdate());
-    //printer.printValue(5,pcontrol.printString());
+    printer.printValue(5,openLoop.printState());
     printer.printValue(6,motor_driver.printState());
     printer.printValue(7,imu.printRollPitchHeading());        
     //printer.printValue(8,imu.printAccels());
@@ -134,10 +126,10 @@ void loop() {
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
-  if ( currentTime-pcontrol.lastExecutionTime > LOOP_PERIOD ) {
-    pcontrol.lastExecutionTime = currentTime;
-    pcontrol.calculateControl(&state_estimator.state);
-    motor_driver.driveForward(pcontrol.uL,pcontrol.uR);
+  if ( currentTime-openLoop.lastExecutionTime > LOOP_PERIOD ) {
+    openLoop.lastExecutionTime = currentTime;
+    openLoop.calculateControl(&state_estimator.state);
+    motor_driver.driveForward(openLoop.uL,openLoop.uR);
   }
 
   /*if ( currentTime-adc.lastExecutionTime > LOOP_PERIOD ) {

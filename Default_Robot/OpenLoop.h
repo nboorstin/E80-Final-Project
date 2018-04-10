@@ -7,6 +7,7 @@
 #include "Pinouts.h"
 #include "StateEstimator.h"
 #include "BigMotor.h"
+#include "Force.h"
 #include <pControl.h>
 
 //for timings
@@ -19,7 +20,7 @@ class OpenLoop{
 public: // for functions outside code might call
   enum Mode {AIR, OPEN_LOOP, ANCHOR_LOWER, ANCHOR_WAIT, ANCHOR_RAISE, GPS};
   
-  OpenLoop(BigMotor& motor, PControl& control);
+  OpenLoop(BigMotor& motor, PControl& control, Force& f);
 
   void init(const int totalWayPoints_in, const int stateDims_in, int * wayPoints_in);
   
@@ -43,6 +44,7 @@ private:
   
   BigMotor& bigMotor;
   PControl& pcontrol;
+  Force& force;
   
   
   

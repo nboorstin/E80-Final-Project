@@ -5,7 +5,9 @@
 #define START_BUTTON_PIN 0
 
 const int START_BUTTON_TRESHOLD = 5;
+const long OPEN_LOOP_DURATION = 5*1000; //5 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
+const int FORCE_THRESHOLD = 500; //?????
 
 // this allows you to use print calls
 // (see IMU or ADC libraries for good examples)
@@ -13,7 +15,7 @@ const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
 extern Printer printer;
 
 // constructor for class objects
-OpenLoop::OpenLoop(BigMotor& motor, PControl& control) : bigMotor(motor), pcontrol(control){
+OpenLoop::OpenLoop(BigMotor& motor, PControl& control, Force& f) : bigMotor(motor), pcontrol(control), force(f){
 }
 
 void OpenLoop::init(const int totalWayPoints_in, const int stateDims_in, int * wayPoints_in) {
@@ -35,40 +37,84 @@ int OpenLoop::getWayPoint(int dim) {
 
 void OpenLoop::calculateControl(state_t * state) {
 	switch(mode) {
-	case AIR:
+	case AIR: {
+    //test big motor control circuit for shorts
+    int secondsInForty = (millis() / 1000);
+    if(secondsInForty < 10)
+      bigMotor.setDirection(BigMotor::FLOATINGG);
+    else if(secondsInForty < 15)
+      bigMotor.setDirection(BigMotor::FWD);
+    else if(secondsInForty < 20)
+      bigMotor.setDirection(BigMotor::BACK);
+    else
+      bigMotor.setDirection(BigMotor::STOP);
+    
 		uL = uR = 0;
 		if(analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD) {
+      //init P control to here
+      const int number_of_waypoints = 1;
+          const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
+          //I hope this works?
+          double waypoints [] = { state->x, state->y};   // listed as x0,y0,x1,y1, ... etc.
+      pcontrol.init(number_of_waypoints, waypoint_dimensions, waypoints);
+  
 			mode = OPEN_LOOP;
+      currentWayPoint = 0;
 			modeStartTime = millis();
-		}
+		}}
 		break;
-	case OPEN_LOOP:
+    
+	case OPEN_LOOP:{
+    uL = getWayPoint(0);
+    uR = getWayPoint(1);
+    if(millis() - modeStartTime > OPEN_LOOP_DURATION) { //move onto next time
+      currentWayPoint++;
+      uL=uR=0;
+      mode = ANCHOR_LOWER;
+      bigMotor.setDirection(BigMotor::FWD);
+      modeStartTime = millis();
+    }}
 		break;
 		
-	case ANCHOR_LOWER:
-		
+	case ANCHOR_LOWER: {
+		uL = uR = 0;
+    if(force.currentForce < FORCE_THRESHOLD) {
+      mode = ANCHOR_WAIT;
+      bigMotor.setDirection(BigMotor::STOP);
+      modeStartTime = millis();
+    }}
 		break;
 		
-	case ANCHOR_WAIT:
+	case ANCHOR_WAIT: {
 		uL = uR = 0;
 		if(millis() - modeStartTime > ANCHOR_WAIT_TIME) {
 			mode = ANCHOR_RAISE;
 			modeStartTime = millis();
 			bigMotor.setDirection(BigMotor::BACK); //raise the motor
-		}
+		}}
 		break;
 		
-	case ANCHOR_RAISE:
-	
+	case ANCHOR_RAISE: {
+	  uL = uR = 0;
+    if(true) { //insert encoder reading here
+      if(currentWayPoint >= totalWayPoints) {
+        mode = GPS;
+      }
+      else {
+        mode = OPEN_LOOP;
+      }
+      bigMotor.setDirection(BigMotor::STOP);
+      modeStartTime = millis();
+    }}
 		break;
 		
-	case GPS:
+	case GPS: {
 		pcontrol.calculateControl(state);
 		uL = pcontrol.uL;
 		uR = pcontrol.uR;
+	  }
 		break;		
 	}
-	
 }
 
 String OpenLoop::printState(void) {
