@@ -8,6 +8,7 @@ const int START_BUTTON_TRESHOLD = 5;
 const long OPEN_LOOP_DURATION = 5*1000; //5 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
 const int FORCE_THRESHOLD = 500; //?????
+const int ANCHOR_LOWER_DURATION = 1000; //1 second
 
 // this allows you to use print calls
 // (see IMU or ADC libraries for good examples)
@@ -68,6 +69,7 @@ void OpenLoop::calculateControl(state_t * state) {
     uL = getWayPoint(0);
     uR = getWayPoint(1);
     if(millis() - modeStartTime > OPEN_LOOP_DURATION) { //move onto next time
+      anchorLanded = false;
       currentWayPoint++;
       uL=uR=0;
       mode = ANCHOR_LOWER;
@@ -79,6 +81,10 @@ void OpenLoop::calculateControl(state_t * state) {
 	case ANCHOR_LOWER: {
 		uL = uR = 0;
     if(force.currentForce < FORCE_THRESHOLD) {
+      anchorLanded = true;
+      modeStartTime = millis();
+    }
+    if(anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION)) {
       mode = ANCHOR_WAIT;
       bigMotor.setDirection(BigMotor::STOP);
       modeStartTime = millis();

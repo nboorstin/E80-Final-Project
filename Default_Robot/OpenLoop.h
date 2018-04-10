@@ -45,6 +45,8 @@ private:
   BigMotor& bigMotor;
   PControl& pcontrol;
   Force& force;
+
+  bool anchorLanded;
   
   
   
