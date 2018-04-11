@@ -24,6 +24,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include "BigMotor.h"
 #include "Pressure.h"
 #include "Force.h"
+#include "RotaryEncoder.h"
 #include "OpenLoop.h"
 
 /////////////////////////* Global Variables *////////////////////////
@@ -41,6 +42,7 @@ LED led;
 BigMotor bigMotor;
 Pressure pressure;
 Force force;
+RotaryEncoder encoder;
 OpenLoop openLoop(bigMotor, pcontrol, force);
 
 // loop start recorder
@@ -60,6 +62,7 @@ void setup() {
   logger.include(&bigMotor);
   logger.include(&pressure);
   logger.include(&force);
+  logger.include(&encoder);
   logger.init();
 
   printer.init();
@@ -87,6 +90,7 @@ void setup() {
   bigMotor.init();
   pressure.init();
   force.init(); 
+  encoder.init();
 
   printer.printMessage("Starting main loop",10);
   loopStartTime = millis();
@@ -99,6 +103,7 @@ void setup() {
   bigMotor.lastExecutionTime        = loopStartTime - LOOP_PERIOD + BIG_MOTOR_LOOP_OFFSET;
   pressure.lastExecutionTime        = loopStartTime - LOOP_PERIOD + PRESSURE_LOOP_OFFSET;
   force.lastExecutionTime           = loopStartTime - LOOP_PERIOD + FORCE_LOOP_OFFSET;
+  encoder.lastExecutionTime         = loopStartTime - LOOP_PERIOD + ROTARY_ENCODER_LOOP_OFFSET;
   logger.lastExecutionTime          = loopStartTime - LOOP_PERIOD + LOGGER_LOOP_OFFSET;
 }
 
@@ -118,11 +123,12 @@ void loop() {
     //printer.printValue(4,pcontrol.printWaypointUpdate());
     printer.printValue(5,openLoop.printState());
     printer.printValue(6,motor_driver.printState());
-    printer.printValue(7,imu.printRollPitchHeading());        
+    //printer.printValue(7,imu.printRollPitchHeading());        
     //printer.printValue(8,imu.printAccels());
     printer.printValue(9,bigMotor.printState());
     printer.printValue(8,pressure.printState());
     printer.printValue(4, force.printState());
+    printer.printValue(7, encoder.printState());
     printer.printToSerial();  // To stop printing, just comment this line out
   }
 
