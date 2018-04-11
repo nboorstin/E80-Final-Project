@@ -43,7 +43,7 @@ BigMotor bigMotor;
 Pressure pressure;
 Force force;
 RotaryEncoder encoder;
-OpenLoop openLoop(bigMotor, pcontrol, force);
+OpenLoop openLoop(bigMotor, pcontrol, force, encoder);
 
 // loop start recorder
 int loopStartTime;

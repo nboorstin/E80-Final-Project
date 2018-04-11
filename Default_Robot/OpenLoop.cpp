@@ -9,6 +9,7 @@ const long OPEN_LOOP_DURATION = 5*1000; //5 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
 const int FORCE_THRESHOLD = 500; //?????
 const int ANCHOR_LOWER_DURATION = 1000; //1 second
+const int ENCODER_THRESHOLD = 100; //4(?) revolutions
 
 // this allows you to use print calls
 // (see IMU or ADC libraries for good examples)
@@ -16,7 +17,7 @@ const int ANCHOR_LOWER_DURATION = 1000; //1 second
 extern Printer printer;
 
 // constructor for class objects
-OpenLoop::OpenLoop(BigMotor& motor, PControl& control, Force& f) : bigMotor(motor), pcontrol(control), force(f){
+OpenLoop::OpenLoop(BigMotor& motor, PControl& control, Force& f, RotaryEncoder& e) : bigMotor(motor), pcontrol(control), force(f), encoder(e){
 }
 
 void OpenLoop::init(const int totalWayPoints_in, const int stateDims_in, int * wayPoints_in) {
@@ -73,6 +74,7 @@ void OpenLoop::calculateControl(state_t * state) {
       currentWayPoint++;
       uL=uR=0;
       mode = ANCHOR_LOWER;
+      startLength = encoder.encodedLength;
       bigMotor.setDirection(BigMotor::FWD);
       modeStartTime = millis();
     }}
@@ -102,7 +104,7 @@ void OpenLoop::calculateControl(state_t * state) {
 		
 	case ANCHOR_RAISE: {
 	  uL = uR = 0;
-    if(true) { //insert encoder reading here
+    if(startLength - encoder.encodedLength <= ENCODER_THRESHOLD) {
       if(currentWayPoint >= totalWayPoints) {
         mode = GPS;
       }

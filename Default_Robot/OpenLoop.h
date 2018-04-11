@@ -8,6 +8,7 @@
 #include "StateEstimator.h"
 #include "BigMotor.h"
 #include "Force.h"
+#include "RotaryEncoder.h"
 #include <pControl.h>
 
 //for timings
@@ -20,7 +21,7 @@ class OpenLoop{
 public: // for functions outside code might call
   enum Mode {AIR, OPEN_LOOP, ANCHOR_LOWER, ANCHOR_WAIT, ANCHOR_RAISE, GPS};
   
-  OpenLoop(BigMotor& motor, PControl& control, Force& f);
+  OpenLoop(BigMotor& motor, PControl& control, Force& f, RotaryEncoder& e);
 
   void init(const int totalWayPoints_in, const int stateDims_in, int * wayPoints_in);
   
@@ -45,10 +46,11 @@ private:
   BigMotor& bigMotor;
   PControl& pcontrol;
   Force& force;
+  RotaryEncoder& encoder;
 
   bool anchorLanded;
   
-  
+  long startLength;
   
 };
 

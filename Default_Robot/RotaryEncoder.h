@@ -23,7 +23,7 @@ public: // for functions outside code might call
 
   String printState(void);
 
-  int encodedLength;
+  long encodedLength;
   
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
