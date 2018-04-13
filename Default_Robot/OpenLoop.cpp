@@ -4,11 +4,12 @@
 //Pin definitions
 #define START_BUTTON_PIN 0
 
-const int START_BUTTON_TRESHOLD = 5;
+const int START_BUTTON_TRESHOLD = 10;
 const long OPEN_LOOP_DURATION = 5*1000; //5 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
-const int FORCE_THRESHOLD = 500; //?????
-const int ANCHOR_LOWER_DURATION = 1000; //1 second
+const int FORCE_THRESHOLD = 550; //Here's hoping...
+const int ANCHOR_LOWER_DURATION_A = 50000; // 5 seconds
+const int ANCHOR_LOWER_DURATION_B = 1000; //1 second
 const int ENCODER_THRESHOLD = 100; //4(?) revolutions
 
 // this allows you to use print calls
@@ -55,9 +56,9 @@ void OpenLoop::calculateControl(state_t * state) {
 		if(analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD) {
       //init P control to here
       const int number_of_waypoints = 1;
-          const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
-          //I hope this works?
-          double waypoints [] = { state->x, state->y};   // listed as x0,y0,x1,y1, ... etc.
+      const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
+      //I hope this works?
+      double waypoints [] = { state->x, state->y};   // listed as x0,y0,x1,y1, ... etc.
       pcontrol.init(number_of_waypoints, waypoint_dimensions, waypoints);
   
 			mode = OPEN_LOOP;
@@ -82,11 +83,11 @@ void OpenLoop::calculateControl(state_t * state) {
 		
 	case ANCHOR_LOWER: {
 		uL = uR = 0;
-    if(force.currentForce < FORCE_THRESHOLD) {
+    if(force.currentForce >= FORCE_THRESHOLD || (millis() - modeStartTime > ANCHOR_LOWER_DURATION_A)) {
       anchorLanded = true;
       modeStartTime = millis();
     }
-    if(anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION)) {
+    if(anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION_B)) {
       mode = ANCHOR_WAIT;
       bigMotor.setDirection(BigMotor::STOP);
       modeStartTime = millis();

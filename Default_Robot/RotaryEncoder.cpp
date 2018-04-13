@@ -25,7 +25,9 @@ void RotaryEncoder::init(void) {
   
   encoder = this;
 
-  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), readEncoder, RISING);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), readEncoder, FALLING);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_B), pinB1, RISING);
+  attachInterrupt(digitalPinToInterrupt(7), pinB2, FALLING);
 
   // this lets you print messages
   // the string gets displayed in the messages area
@@ -39,9 +41,19 @@ String RotaryEncoder::printState(void) {
   return printString;
 }
 
+void RotaryEncoder::pinB1(void) {
+  if(encoder != nullptr) {
+    encoder->pinBHigh = true;
+  }
+}
+void RotaryEncoder::pinB2(void) {
+  if(encoder != nullptr) {
+    encoder->pinBHigh = false;
+  }
+}
 void RotaryEncoder::readEncoder(void) {
   if(encoder != nullptr) {
-      if(digitalRead(ENCODER_PIN_B)) {
+      if(encoder->pinBHigh) {
         encoder -> encodedLength++;
       }
       else {

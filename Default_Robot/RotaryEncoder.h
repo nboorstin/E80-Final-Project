@@ -20,6 +20,10 @@ public: // for functions outside code might call
   void init(void);
 
   static void readEncoder(void);
+  static void pinB1(void);
+  static void pinB2(void);
+
+  volatile bool pinBHigh = false;
 
   String printState(void);
 
@@ -30,6 +34,7 @@ public: // for functions outside code might call
   int lastExecutionTime = -1;
   
   static RotaryEncoder* encoder;// = nullptr; //ugh this is prolly not the best
+  
   
 };
 

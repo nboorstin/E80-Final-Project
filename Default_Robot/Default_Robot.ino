@@ -57,7 +57,7 @@ void setup() {
   logger.include(&imu);
   logger.include(&gps);
   logger.include(&state_estimator);
-  logger.include(&motor_driver);
+  //logger.include(&motor_driver);
   //logger.include(&adc);
   logger.include(&bigMotor);
   logger.include(&pressure);
