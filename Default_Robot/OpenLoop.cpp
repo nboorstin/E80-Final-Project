@@ -87,7 +87,8 @@ void OpenLoop::calculateControl(state_t * state) {
       anchorLanded = true;
       modeStartTime = millis();
     }
-    if(anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION_B)) {
+    if((anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION_B)) ||
+          (analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD)){
       mode = ANCHOR_WAIT;
       bigMotor.setDirection(BigMotor::STOP);
       modeStartTime = millis();
@@ -105,7 +106,7 @@ void OpenLoop::calculateControl(state_t * state) {
 		
 	case ANCHOR_RAISE: {
 	  uL = uR = 0;
-    if(startLength - encoder.encodedLength <= ENCODER_THRESHOLD) {
+    if((startLength - encoder.encodedLength <= ENCODER_THRESHOLD) || (analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD)) {
       if(currentWayPoint >= totalWayPoints) {
         mode = GPS;
       }
