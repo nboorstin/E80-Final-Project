@@ -23,11 +23,15 @@ public: // for functions outside code might call
 
   String printState(void);
 
-  int currentPressure;
+  bool firstRead = true;
+  float currentPressure, pressureFiltered;
   
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
   int lastExecutionTime = -1;
+
+private:
+  const float lambda = 0.5;
   
 };
 

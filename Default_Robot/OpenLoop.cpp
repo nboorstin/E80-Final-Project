@@ -5,7 +5,7 @@
 #define START_BUTTON_PIN 0
 
 const int START_BUTTON_TRESHOLD = 10;
-const long OPEN_LOOP_DURATION = 5*1000; //5 seconds
+const long OPEN_LOOP_DURATION = 10*1000; //10 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
 const int FORCE_THRESHOLD = 550; //Here's hoping...
 const int ANCHOR_LOWER_DURATION_A = 50000; // 5 seconds

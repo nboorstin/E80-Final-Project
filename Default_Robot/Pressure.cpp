@@ -10,7 +10,7 @@
 extern Printer printer;
 
 // constructor for class objects
-Pressure::Pressure(void) : DataSource("pressure","int32"){
+Pressure::Pressure(void) : DataSource("pressure,pressureFiltered","float,float"){
 }
 
 void Pressure::init(void) {
@@ -18,6 +18,7 @@ void Pressure::init(void) {
   pinMode(PRESSURE_PIN, INPUT);
 
   currentPressure = 0;
+  firstRead = true;
 
   // this lets you print messages
   // the string gets displayed in the messages area
@@ -27,16 +28,24 @@ void Pressure::init(void) {
 
 String Pressure::printState(void) {
   String printString = "Pressure: ";
-  printString += currentPressure;
+  printString += pressureFiltered;
   return printString;
 }
 
 void Pressure::readPressure(void) {
 	currentPressure = analogRead(PRESSURE_PIN);
+  if(firstRead) {
+    firstRead = false;
+    pressureFiltered = currentPressure;
+  }
+  else {
+    pressureFiltered = (lambda * pressureFiltered) + ((1.0 - lambda) * currentPressure);
+  }
 }
 
 size_t Pressure::writeDataBytes(unsigned char * buffer, size_t idx) {
-  int * data_slot = (int *) &buffer[idx];
+  float * data_slot = (float *) &buffer[idx];
   data_slot[0] = currentPressure;
-  return idx + sizeof(int);
+  data_slot[1] = pressureFiltered;
+  return idx + 2*sizeof(float);
 }

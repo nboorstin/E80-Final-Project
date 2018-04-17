@@ -20,14 +20,17 @@ public: // for functions outside code might call
 
   void readForce(void);
 
-  int currentForce;
+  bool firstRead = true;
+  double currentForce, filteredForce;
 
   String printState(void);
   
   size_t writeDataBytes(unsigned char * buffer, size_t idx);
 
   int lastExecutionTime = -1;
-  
+
+private:
+  const float lambda = 0.5;
 };
 
 #endif

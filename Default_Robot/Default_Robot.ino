@@ -20,7 +20,7 @@ Previous Contributors:  Josephine Wong (jowong@hmc.edu) '18 (contributed in 2016
 #include <Printer.h>
 #include <PControl.h>
 #define mySerial Serial1
-#include <LED.h>  // A template of a data soruce library
+//#include <LED.h>  // A template of a data soruce library
 #include "BigMotor.h"
 #include "Pressure.h"
 #include "Force.h"
@@ -38,7 +38,7 @@ Adafruit_GPS GPS(&mySerial);  // FIX THIS
 SensorIMU imu;
 Logger logger;
 Printer printer;
-LED led;
+//LED led;
 BigMotor bigMotor;
 Pressure pressure;
 Force force;
@@ -51,6 +51,9 @@ int currentTime;
 int current_way_point = 0;
 
 ////////////////////////* Setup *////////////////////////////////
+const int number_of_waypoints = 2;
+const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
+int waypoints [] = { 100, 100, 100, 50};   // listed as x0,y0,x1,y1, ... etc.
 
 void setup() {
   
@@ -70,12 +73,10 @@ void setup() {
   mySerial.begin(9600);
   gps.init(&GPS);
   motor_driver.init();
-  led.init();
+  //led.init();
   
 
-  const int number_of_waypoints = 2;
-  const int waypoint_dimensions = 2;       // waypoints have two pieces of information, x then y.
-  int waypoints [] = { 255, 255, 255, 100};   // listed as x0,y0,x1,y1, ... etc.
+  
   openLoop.init(number_of_waypoints, waypoint_dimensions, waypoints);
 
   /*const int number_of_waypoints = 1;
