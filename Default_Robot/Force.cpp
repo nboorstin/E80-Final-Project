@@ -47,5 +47,5 @@ size_t Force::writeDataBytes(unsigned char * buffer, size_t idx) {
   float * data_slot = (float *) &buffer[idx];
   data_slot[0] = currentForce;
   data_slot[1] = filteredForce;
-  return idx + sizeof(float);
+  return idx + 2*sizeof(float);
 }

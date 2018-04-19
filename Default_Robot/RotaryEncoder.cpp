@@ -54,10 +54,10 @@ void RotaryEncoder::pinB2(void) {
 void RotaryEncoder::readEncoder(void) {
   if(encoder != nullptr) {
       if(encoder->pinBHigh) {
-        encoder -> encodedLength++;
+        encoder -> encodedLength--;
       }
       else {
-        encoder -> encodedLength--;
+        encoder -> encodedLength++;
       }
   }
 }

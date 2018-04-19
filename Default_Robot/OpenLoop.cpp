@@ -43,14 +43,15 @@ void OpenLoop::calculateControl(state_t * state) {
 	case AIR: {
     //test big motor control circuit for shorts
     int secondsInForty = (millis() / 1000);
-    if(secondsInForty < 10)
+    /*if(secondsInForty < 10)
       bigMotor.setDirection(BigMotor::FLOATINGG);
     else if(secondsInForty < 15)
       bigMotor.setDirection(BigMotor::FWD);
     else if(secondsInForty < 20)
       bigMotor.setDirection(BigMotor::BACK);
     else
-      bigMotor.setDirection(BigMotor::STOP);
+      bigMotor.setDirection(BigMotor::STOP);*/
+    bigMotor.setDirection(BigMotor::FLOATINGG);
     
 		uL = uR = 0;
 		if(analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD) {
