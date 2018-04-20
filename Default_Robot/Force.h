@@ -30,7 +30,7 @@ public: // for functions outside code might call
   int lastExecutionTime = -1;
 
 private:
-  const float lambda = 0.5;
+  const float lambda = 0.7;
 };
 
 #endif

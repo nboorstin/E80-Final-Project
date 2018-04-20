@@ -49,6 +49,7 @@ private:
   RotaryEncoder& encoder;
 
   bool anchorLanded;
+  double forceStart;
   
   long startLength;
   

@@ -7,7 +7,7 @@
 const int START_BUTTON_TRESHOLD = 10;
 const long OPEN_LOOP_DURATION = 10*1000; //10 seconds
 const long ANCHOR_WAIT_TIME = 30*1000; //30 seconds
-const int FORCE_THRESHOLD = 550; //Here's hoping...
+const int FORCE_THRESHOLD = 45; //Here's hoping...
 const int ANCHOR_LOWER_DURATION_A = 50000; // 5 seconds
 const int ANCHOR_LOWER_DURATION_B = 1000; //1 second
 const int ENCODER_THRESHOLD = 100; //4(?) revolutions
@@ -64,6 +64,7 @@ void OpenLoop::calculateControl(state_t * state) {
   
 			mode = OPEN_LOOP;
       currentWayPoint = 0;
+      forceStart = force.filteredForce;
 			modeStartTime = millis();
 		}}
 		break;
@@ -84,20 +85,24 @@ void OpenLoop::calculateControl(state_t * state) {
 		
 	case ANCHOR_LOWER: {
 		uL = uR = 0;
-    if(force.currentForce >= FORCE_THRESHOLD || (millis() - modeStartTime > ANCHOR_LOWER_DURATION_A)) {
+    if(abs(force.filteredForce - forceStart) >= FORCE_THRESHOLD || (millis() - modeStartTime > ANCHOR_LOWER_DURATION_A)/*) {
       anchorLanded = true;
       modeStartTime = millis();
     }
-    if((anchorLanded && (millis() - modeStartTime > ANCHOR_LOWER_DURATION_B)) ||
+    if(((anchorLanded == true) && (millis() - modeStartTime > ANCHOR_LOWER_DURATION_B)) */||
           (analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD)){
       mode = ANCHOR_WAIT;
       bigMotor.setDirection(BigMotor::STOP);
       modeStartTime = millis();
-    }}
+    }
+    }
 		break;
 		
 	case ANCHOR_WAIT: {
 		uL = uR = 0;
+    if(analogRead(START_BUTTON_PIN) < START_BUTTON_TRESHOLD) {
+      while(true);
+    }
 		if(millis() - modeStartTime > ANCHOR_WAIT_TIME) {
 			mode = ANCHOR_RAISE;
 			modeStartTime = millis();
